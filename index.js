@@ -2,9 +2,9 @@ const BG_COLOUR = '#231f20';
 const SNAKE_COLOUR = '#c2c2c2';
 const FOOD_COLOUR = '#f11';
 const FOOD_COLOUR2 = '#ee1';
-const ADRESS = "https://snakec.onrender.com";
+const ADRESS = "https://snakec.onrender.com:3000/main";
 
-const socket = io(ADRESS + ":3000");
+const socket = io(ADRESS);
 
 socket.on('init', handleInit);
 socket.on('gameState', handleGameState);
