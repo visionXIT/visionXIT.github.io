@@ -2,7 +2,7 @@ const BG_COLOUR = '#231f20';
 const SNAKE_COLOUR = '#c2c2c2';
 const FOOD_COLOUR = '#f11';
 const FOOD_COLOUR2 = '#ee1';
-const ADRESS = "http://localhost";
+const ADRESS = "https://snakec.onrender.com";
 
 const socket = io(ADRESS + ":3000");
 
