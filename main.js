@@ -3,8 +3,8 @@ const SNAKE_COLOUR = '#c2c2c2';
 const FOOD_COLOUR = '#f11';
 const FOOD_COLOUR2 = '#ee1';
 const ADDRESS = "https://fine-pear-boa-shoe.cyclic.app";
-const SOCKET_ADDRESS = ADDRESS + ":8000"
-const HTTP_ADDRESS = ADDRESS + ":8000"
+const SOCKET_ADDRESS = ADDRESS
+const HTTP_ADDRESS = ADDRESS
 
 const socket = io(SOCKET_ADDRESS);
 
