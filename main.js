@@ -80,7 +80,7 @@ gameInfo.hidden = true;
 $msgBox.hide()
 
 reloadGames()
-setInterval(() => reloadGames(), 10000);
+// setInterval(() => reloadGames(), 10000);
 loadAuth();
 conductStates();
 
@@ -310,12 +310,12 @@ async function newGame() {
         'minPlayers': 1,
         'maxPlayers': 5,
         'ownerId': userId,
-        "delayTime": 4000,
+        "delayTime": 10000,
         "endPlay": false,
         "maxSpeedPhase": 10,
         "startSpeedPhaze": 20,
         "increasingVelPerScores": 2,
-        "numApples": 2
+        "numApples": 3
       }
     })
   })
