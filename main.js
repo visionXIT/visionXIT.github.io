@@ -467,6 +467,12 @@ function paintGame(game) {
     if (!player.alive) continue;
     paintPlayer(player, size);
   }
+  ctx.moveTo(90, 90);
+  ctx.lineTo(170, 170);
+  ctx.moveTo(170, 90);
+  ctx.lineTo(90, 170);
+  ctx.lineWidth = 15;
+  ctx.stroke();
 }
 
 function paintPlayer(player, size) {
