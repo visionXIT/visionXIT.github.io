@@ -311,11 +311,11 @@ async function newGame() {
         'maxPlayers': 5,
         'ownerId': userId,
         "delayTime": 4000,
-        "endPlay": true,
-        "maxSpeedPhase": 8,
+        "endPlay": false,
+        "maxSpeedPhase": 10,
         "startSpeedPhaze": 20,
-        "increasingVelPerScores": 3,
-        "numApples": 1
+        "increasingVelPerScores": 2,
+        "numApples": 2
       }
     })
   })
