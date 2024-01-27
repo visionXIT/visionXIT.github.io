@@ -426,16 +426,16 @@ function keydown(e) {
   const code = e.keyCode;
   switch (code) {
     case 37:
-      move = 0;
-      break;
-    case 40:
-      move = 3;
-      break;
-    case 39:
       move = 1;
       break;
-    case 38:
+    case 40:
       move = 2;
+      break;
+    case 39:
+      move = 0;
+      break;
+    case 38:
+      move = 3;
       break;
     default:
       return;
