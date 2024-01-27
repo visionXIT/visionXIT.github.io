@@ -313,9 +313,9 @@ async function newGame() {
         "delayTime": 10000,
         "endPlay": false,
         "maxSpeedPhase": 10,
-        "startSpeedPhaze": 20,
+        "startSpeedPhaze": 18,
         "increasingVelPerScores": 2,
-        "numApples": 3
+        "numApples": 5
       }
     })
   })
