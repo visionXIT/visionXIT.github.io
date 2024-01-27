@@ -80,8 +80,8 @@ gameInfo.hidden = true;
 $msgBox.hide()
 
 reloadGames()
-setInterval(() => reloadGames(), 500000);
-// loadAuth();
+setInterval(() => reloadGames(), 10000);
+loadAuth();
 conductStates();
 
 
