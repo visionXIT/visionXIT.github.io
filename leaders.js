@@ -11,7 +11,6 @@ async function loadLeaders() {
     handleHttpErrors(res, body);
     return;
   }
-  console.log(body);
   setLeaders(body);
 }
 

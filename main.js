@@ -223,7 +223,7 @@ async function newGame() {
         "maxSpeedPhase": 10,
         "startSpeedPhaze": 18,
         "increasingVelPerScores": 2,
-        "numApples": 5
+        "numApples": 4
       }
     })
   })
@@ -323,7 +323,6 @@ function init() {
 
   ctx.fillStyle = BG_COLOUR;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
-  console.log("Init");
 }
 
 function keydown(e) {
@@ -384,6 +383,7 @@ function paintPlayer(player, size) {
   ctx.fillStyle = colorRgb;
   ctx.strokeStyle = 'gray';
   for (let cell of snake.body.slice(0, -1)) {
+    ctx.fillStyle = colorRgb;
     ctx.fillRect(Math.ceil(cell.x) * size, Math.ceil(cell.y) * size, size, size);
     if (player.started) {
       ctx.lineWidth = 1;
@@ -392,7 +392,15 @@ function paintPlayer(player, size) {
       ctx.strokeStyle = 'gold'
       ctx.lineWidth = 3;
       ctx.strokeRect(Math.ceil(cell.x) * size, Math.ceil(cell.y) * size, size, size);
-    }
+    }    
+  }
+  for (let id = 0; id < snake.body.length - 1; id++) {
+    ctx.beginPath(); // Начинает новый путь
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = 'yellow';
+    ctx.moveTo(Math.ceil(snake.body[id].x) * size + size/2, Math.ceil(snake.body[id].y) * size + size/2); // Передвигает перо в точку (30, 50)
+    ctx.lineTo(Math.ceil(snake.body[id + 1].x) * size + size/2, Math.ceil(snake.body[id + 1].y) * size + size/2); // Рисует линию до точки (150, 100)
+    ctx.stroke(); // Отображает путь
   }
   if (!player.started) {
     ctx.strokeStyle = 'gold'
