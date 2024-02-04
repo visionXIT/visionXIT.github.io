@@ -40,6 +40,7 @@ const lastWinnerDiv = document.getElementById('lastWinnerDiv');
 const lastWinnerText = document.getElementById('lastWinnerText');
 
 const logoutBtn = document.getElementById('logoutBtn');
+const joinInGameBtn = document.getElementById('joinInGameBtn');
 
 const canvas = document.getElementById('canvas');
 
@@ -64,6 +65,7 @@ startGameBtn.addEventListener('click', startGame)
 goBackBtn.addEventListener('click', goBackToMain);
 logoutBtn.addEventListener('click', logout);
 reloadBtn.addEventListener('click', reloadGames);
+joinInGameBtn.addEventListener('click', joinGameByBtn);
 
 welcomeTextDiv.hidden = true
 initialScreen.hidden = true
@@ -77,7 +79,28 @@ loadAuth();
 conductStates();
 reloadGames();
 
-
+async function joinGameByBtn() {
+  if (!gameId) {
+    showError("Cannot find a game");
+    return;
+  }
+  const res = await fetch(HTTP_ADDRESS + '/game/check_gameId/' + gameId);
+  const body = await res.json();
+  if (!res.ok) {
+    handleHttpErrors(res, body);
+    return;
+  }
+  if (!body) {
+    showError("Incorrect game code");
+    return;
+  }
+  
+  socket.emit('join_game', {gameId, userId});
+  init();
+  gameCodeDisplay.textContent = gameId;
+  initialScreen.hidden = true;
+  gameScreen.hidden = false;
+}
 
 function reloadGames() {
   getAllGames();  
@@ -181,7 +204,7 @@ async function registerUser() {
     const err = await res.json();
     handleHttpErrors(res, err);
     return;
-  }
+  }  
   let id = await res.json();
   userId = id;
   userName.textContent = name;  
@@ -425,6 +448,7 @@ function paintGame(game) {
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   const size = canvas.width / SCREEN_SIZE
   ctx.strokeStyle = 'green';
+  ctx.lineWidth = 1;
   for (let i = 0; i < SCREEN_SIZE; i++) {
     for (let j = 0; j < SCREEN_SIZE; j++) {
       ctx.strokeRect(i * size, j * size, size, size);
@@ -445,8 +469,8 @@ function paintGame(game) {
   if (player.snake.head.x > game.fieldSettings.fieldW - SCREEN_SIZE / 2) {
     const dif = SCREEN_SIZE / 2 - (game.fieldSettings.fieldW - player.snake.head.x);
     ctx.fillStyle = '#eee';
-    for (let i = 0; i < dif; i++) {
-      for (let j = SCREEN_SIZE - 1; j > SCREEN_SIZE - dif - 1; j--) {
+    for (let i = SCREEN_SIZE - 1; i > SCREEN_SIZE - dif - 1; i--) {
+      for (let j = 0; j < SCREEN_SIZE; j++) {
         ctx.fillRect(i * size, j * size, size, size);
       }
     }
@@ -495,6 +519,10 @@ function drawMinimap(game) {
   const sizex = sx / 20, sizey = sy / 20;
   ctx.fillStyle = '#ccc';
   ctx.fillRect(gx, gy, sx, sy);
+  ctx.strokeStyle = 'red';
+  ctx.lineWidth = 3;
+  ctx.strokeRect(gx, gy, sx, sy);
+
   for (const p of game.players) {
     const color = p.color;
     const colorRgb = `rgb(${Math.floor(color[0] * 255)}, ${Math.floor(color[1] * 255)}, ${Math.floor(color[2] * 255)})`;

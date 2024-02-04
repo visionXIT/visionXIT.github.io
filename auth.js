@@ -22,6 +22,7 @@ async function loadAuth() {
       return;
     }
     userName.textContent = body.name;  
+    console.log(userId);
     userId = +ui;
     state = STATE_HOME;
     conductStates();
@@ -42,7 +43,7 @@ async function logout() {
     {
       method: 'POST',
       headers: {
-        'Content-pe': 'application/json;charset=utf-8'
+        'Content-Type': 'application/json;charset=utf-8'
       },
       body: JSON.stringify({userId})
     }
