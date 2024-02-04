@@ -234,8 +234,8 @@ async function newGame() {
     },
     "body": JSON.stringify({
       'fieldSettings': {
-        "fieldW": 40,
-        "fieldH": 40
+        "fieldW": 100,
+        "fieldH": 100
       },
       'gameSettings': {
         'minPlayers': 1,
@@ -245,8 +245,8 @@ async function newGame() {
         "endPlay": false,
         "maxSpeedPhase": 10,
         "startSpeedPhaze": 18,
-        "increasingVelPerScores": 3,
-        "numApples": 13
+        "increasingVelPerScores": 2,
+        "numApples": 50
       }
     })
   })
