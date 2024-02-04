@@ -2,6 +2,7 @@ const BG_COLOUR = '#231f20';
 const SNAKE_COLOUR = '#c2c2c2';
 const FOOD_COLOUR = '#f11';
 const FOOD_COLOUR2 = '#ee1';
+const SCREEN_SIZE = 20;
 
 const socket = io(SOCKET_ADDRESS);
 
@@ -210,8 +211,8 @@ async function newGame() {
     },
     "body": JSON.stringify({
       'fieldSettings': {
-        "fieldW": 20,
-        "fieldH": 20
+        "fieldW": 40,
+        "fieldH": 40
       },
       'gameSettings': {
         'minPlayers': 1,
@@ -221,8 +222,8 @@ async function newGame() {
         "endPlay": false,
         "maxSpeedPhase": 10,
         "startSpeedPhaze": 18,
-        "increasingVelPerScores": 2,
-        "numApples": 3
+        "increasingVelPerScores": 3,
+        "numApples": 13
       }
     })
   })
@@ -356,7 +357,7 @@ function keydown(e) {
   e.preventDefault();
 }
 
-function paintGame(game) {
+function paintGame2(game) {
   ctx.fillStyle = BG_COLOUR;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   const gridsizeW = game.fieldSettings.fieldW;
@@ -390,34 +391,167 @@ function paintPlayer(player, sizeW, sizeH) {
   ctx.strokeStyle = 'gray';
   for (let cell of snake.body.slice(0, -1)) {
     ctx.fillStyle = colorRgb;
-    ctx.fillRect(Math.ceil(cell.x) * sizeW, Math.ceil(cell.y) * sizeH, sizeW, sizeH);
+    ctx.fillRect((cell.x) * sizeW, (cell.y) * sizeH, sizeW, sizeH);
     if (player.started) {
       ctx.lineWidth = 1;
-      ctx.strokeRect(Math.ceil(cell.x) * sizeW, Math.ceil(cell.y) * sizeH, sizeW, sizeH);
+      ctx.strokeRect((cell.x) * sizeW, (cell.y) * sizeH, sizeW, sizeH);
     } else {
       ctx.strokeStyle = 'gold'
       ctx.lineWidth = 3;
-      ctx.strokeRect(Math.ceil(cell.x) * sizeW, Math.ceil(cell.y) * sizeH, sizeW, sizeH);
+      ctx.strokeRect((cell.x) * sizeW, (cell.y) * sizeH, sizeW, sizeH);
     }    
   }
   for (let id = 0; id < snake.body.length - 1; id++) {
     ctx.beginPath(); // Начинает новый путь
     ctx.lineWidth = 2;
     ctx.strokeStyle = 'yellow';
-    ctx.moveTo(Math.ceil(snake.body[id].x) * sizeW + sizeW/2, Math.ceil(snake.body[id].y) * sizeH + sizeH/2); // Передвигает перо в точку (30, 50)
-    ctx.lineTo(Math.ceil(snake.body[id + 1].x) * sizeW + sizeW/2, Math.ceil(snake.body[id + 1].y) * sizeH + sizeH/2); // Рисует линию до точки (150, 100)
+    ctx.moveTo((snake.body[id].x) * sizeW + sizeW/2, (snake.body[id].y) * sizeH + sizeH/2); // Передвигает перо в точку (30, 50)
+    ctx.lineTo((snake.body[id + 1].x) * sizeW + sizeW/2, (snake.body[id + 1].y) * sizeH + sizeH/2); // Рисует линию до точки (150, 100)
     ctx.stroke(); // Отображает путь
   }
   if (!player.started) {
     ctx.strokeStyle = 'gold'
     ctx.lineWidth = 3;
-    ctx.strokeRect(Math.ceil(snake.body.at(-1).x) * sizeW, Math.ceil(snake.body.at(-1).y) * sizeH, sizeW, sizeH);
+    ctx.strokeRect((snake.body.at(-1).x) * sizeW, (snake.body.at(-1).y) * sizeH, sizeW, sizeH);
   }
   ctx.lineWidth = 1;
   ctx.fillStyle = "#def";
-  ctx.fillRect(Math.ceil(snake.body.at(-1).x) * sizeW, Math.ceil(snake.body.at(-1).y) * sizeH, sizeW, sizeH);
+  ctx.fillRect((snake.body.at(-1).x) * sizeW, (snake.body.at(-1).y) * sizeH, sizeW, sizeH);
 }
 
+
+function paintGame(game) {
+  ctx.fillStyle = BG_COLOUR;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  const size = canvas.width / SCREEN_SIZE
+  ctx.strokeStyle = 'green';
+  for (let i = 0; i < SCREEN_SIZE; i++) {
+    for (let j = 0; j < SCREEN_SIZE; j++) {
+      ctx.strokeRect(i * size, j * size, size, size);
+    }
+  }
+  const player = game.players.find(p => p.userId === userId);
+  const minX = player.snake.head.x - SCREEN_SIZE / 2, maxX = player.snake.head.x + SCREEN_SIZE / 2;
+  const minY = player.snake.head.y - SCREEN_SIZE / 2, maxY = player.snake.head.y + SCREEN_SIZE / 2;
+  if (player.snake.head.x < SCREEN_SIZE / 2) {
+    const dif = SCREEN_SIZE / 2 - player.snake.head.x;
+    ctx.fillStyle = '#eee';
+    for (let i = 0; i < dif; i++) {
+      for (let j = 0; j < SCREEN_SIZE; j++) {
+        ctx.fillRect(i * size, j * size, size, size);
+      }
+    }
+  }
+  if (player.snake.head.x > game.fieldSettings.fieldW - SCREEN_SIZE / 2) {
+    const dif = SCREEN_SIZE / 2 - (game.fieldSettings.fieldW - player.snake.head.x);
+    ctx.fillStyle = '#eee';
+    for (let i = 0; i < dif; i++) {
+      for (let j = SCREEN_SIZE - 1; j > SCREEN_SIZE - dif - 1; j--) {
+        ctx.fillRect(i * size, j * size, size, size);
+      }
+    }
+  }
+  if (player.snake.head.y < SCREEN_SIZE / 2) {
+    const dif = SCREEN_SIZE / 2 - player.snake.head.y;
+    ctx.fillStyle = '#eee';
+    for (let j = 0; j < dif; j++) {
+      for (let i = 0; i < SCREEN_SIZE; i++) {
+        ctx.fillRect(i * size, j * size, size, size);
+      }
+    }
+  }
+  if (player.snake.head.y > game.fieldSettings.fieldH - SCREEN_SIZE / 2) {
+    const dif = SCREEN_SIZE / 2 - (game.fieldSettings.fieldH - player.snake.head.y);
+    ctx.fillStyle = '#eee';
+    for (let j = SCREEN_SIZE - 1; j > SCREEN_SIZE - dif - 1; j--) {
+      for (let i = 0; i < SCREEN_SIZE; i++) {
+        ctx.fillRect(i * size, j * size, size, size);
+      }
+    }
+  }
+
+  for (let food of game.foods) {
+    if (!checkInArea(food.x, food.y, minX, maxX, minY, maxY)) {
+      continue;
+    }
+    if (food.adds != 1)
+      ctx.fillStyle = FOOD_COLOUR2;
+    else
+      ctx.fillStyle = FOOD_COLOUR;
+    ctx.fillRect((food.x - minX) * size, (food.y - minY) * size, size, size);
+  }
+
+  for (let player of game.players) {
+    if (!player.alive) continue;
+    paintPlayer2(player, size, minX, maxX, minY, maxY);
+  }
+
+  drawMinimap(game);
+}
+
+function drawMinimap(game) {
+  const gx = canvas.width - 0.15 * canvas.width, gy = 0;
+  const sx = 0.15 * canvas.width, sy = 0.15 * canvas.height;
+  const sizex = sx / 20, sizey = sy / 20;
+  ctx.fillStyle = '#ccc';
+  ctx.fillRect(gx, gy, sx, sy);
+  for (const p of game.players) {
+    const color = p.color;
+    const colorRgb = `rgb(${Math.floor(color[0] * 255)}, ${Math.floor(color[1] * 255)}, ${Math.floor(color[2] * 255)})`;
+    ctx.fillStyle = colorRgb;
+    ctx.fillRect(gx + p.snake.head.x * sx / game.fieldSettings.fieldW, gy + p.snake.head.y * sy / game.fieldSettings.fieldH, sizex, sizey);
+  }
+}
+
+function checkInArea(x, y, minX, maxX, minY, maxY) {
+  return (x >= minX && x <= maxX) && (y >= minY && y <= maxY);
+}
+
+function paintPlayer2(player, size, minX, maxX, minY, maxY) {
+  const snake = player.snake;
+  const color = player.color;
+  const colorRgb = `rgb(${Math.floor(color[0] * 255)}, ${Math.floor(color[1] * 255)}, ${Math.floor(color[2] * 255)})`;
+  ctx.fillStyle = colorRgb;
+  ctx.strokeStyle = 'gray';
+  for (let cell of snake.body.slice(0, -1)) {
+    if (!checkInArea(cell.x, cell.y, minX, maxX, minY, maxY)) {
+      continue;
+    }
+    cell.x -= minX;
+    cell.y -= minY;
+    ctx.fillStyle = colorRgb;
+    ctx.fillRect((cell.x) * size, (cell.y) * size, size, size);
+    if (player.started) {
+      ctx.lineWidth = 1;
+      ctx.strokeRect((cell.x) * size, (cell.y) * size, size, size);
+    } else {
+      ctx.strokeStyle = 'gold'
+      ctx.lineWidth = 3;
+      ctx.strokeRect((cell.x) * size, (cell.y) * size, size, size);
+    }    
+  }
+  // for (let id = 0; id < snake.body.length - 1; id++) {
+  //   if (!checkInArea(snake.body[id + 1].x, snake.body[id + 1].y, minX, maxX, minY, maxY)) {
+  //     continue;
+  //   }
+  //   ctx.beginPath(); // Начинает новый путь
+  //   ctx.lineWidth = 2;
+  //   ctx.strokeStyle = 'yellow';
+  //   ctx.moveTo((snake.body[id].x) * size + size/2, (snake.body[id].y) * size + size/2); // Передвигает перо в точку (30, 50)
+  //   ctx.lineTo((snake.body[id + 1].x) * size + size/2, (snake.body[id + 1].y) * size + size/2); // Рисует линию до точки (150, 100)
+  //   ctx.stroke(); // Отображает путь
+  // }
+  if (checkInArea(snake.body.at(-1).x, snake.body.at(-1).y, minX, maxX, minY, maxY)) {
+    if (!player.started) {
+      ctx.strokeStyle = 'gold'
+      ctx.lineWidth = 3;
+      ctx.strokeRect((snake.body.at(-1).x - minX) * size, (snake.body.at(-1).y - minY) * size, size, size);
+    }
+    ctx.lineWidth = 1;
+    ctx.fillStyle = "#def";
+    ctx.fillRect((snake.body.at(-1).x - minX) * size, (snake.body.at(-1).y - minY) * size, size, size);
+  }
+}
 
 function conductStates() {
   switch (state) {
