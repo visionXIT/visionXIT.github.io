@@ -100,6 +100,7 @@ async function joinGameByBtn() {
   gameCodeDisplay.textContent = gameId;
   initialScreen.hidden = true;
   gameScreen.hidden = false;
+  gameActive = true;
 }
 
 function reloadGames() {
@@ -284,6 +285,7 @@ async function joinGame() {
   gameCodeDisplay.textContent = gameId;
   initialScreen.hidden = true;
   gameScreen.hidden = false;
+
 } 
 
 async function getAllGames() {
