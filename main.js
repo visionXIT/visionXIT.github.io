@@ -305,13 +305,17 @@ function drawGames(games) {
 
 async function deleteGame(e) {
   console.log(e);
-  // const res = await fetch(HTTP_ADDRESS + '/game/delete_game', {
-  //   method: 'POST',
-  //   'headers': {
-  //     'Content-Type': 'application/json;charset=utf-8'
-  //   },
-  //   "body": JSON.stringify({userId, e})
-  // });
+  const res = await fetch(HTTP_ADDRESS + '/game/delete_game', {
+    method: 'POST',
+    'headers': {
+      'Content-Type': 'application/json;charset=utf-8'
+    },
+    "body": JSON.stringify({userId, e})
+  });
+  if (!res.ok) {
+    const err = await res.json();
+    handleHttpErrors(res, err);
+  }
 }
 
 function init() {
