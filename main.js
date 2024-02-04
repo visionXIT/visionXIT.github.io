@@ -43,9 +43,6 @@ const logoutBtn = document.getElementById('logoutBtn');
 
 const canvas = document.getElementById('canvas');
 
-const msgBox = document.getElementById('msgBox');
-const $msgBox = $('#msgBox');
-
 const STATE_REG = 2, STATE_HOME = 0, STATE_GAME = 1;
 let state = STATE_REG;
 
@@ -57,7 +54,7 @@ let code;
 let colors = [];
 let roomPlayers = [];
 let games = [];
-let userId, gameId;
+let gameId;
 
 document.addEventListener('keydown', keydown);
 newGameBtn.addEventListener('click', newGame);
@@ -81,63 +78,6 @@ conductStates();
 reloadGames();
 
 
-function setAuth() {
-  if (!userId) {
-    showError("You are not logged in");
-    return;
-  }
-  localStorage.setItem('auth', userId);
-}
-
-async function loadAuth() {
-  let ui = localStorage.getItem('auth');
-  if (ui) {
-    const res = await fetch(HTTP_ADDRESS + '/auth/get_user/' + ui);
-    const body = await res.json();
-    if (!res.ok) {
-      if (res.status === 404) {
-        removeAuth();
-        return;
-      }
-      handleHttpErrors(res, body);
-      return;
-    }
-    userName.textContent = body.name;  
-    userId = +ui;
-    state = STATE_HOME;
-    conductStates();
-  }
-}
-
-function removeAuth() {
-  localStorage.removeItem('auth');
-}
-
-async function logout() {
-  if (!userId) {
-    showError("You are not logged in");
-    return;
-  }
-  const res = await fetch(
-    HTTP_ADDRESS + '/auth/logout',
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json;charset=utf-8'
-      },
-      body: JSON.stringify({userId})
-    }
-  );
-  if (!res.ok) {
-    const err = await res.json();
-    handleHttpErrors(res, err);
-    return;
-  }
-  userId = null;
-  state = STATE_REG;
-  conductStates();
-  removeAuth();
-}
 
 function reloadGames() {
   getAllGames();  
@@ -153,34 +93,6 @@ function startGame() {
   socket.emit('start_game', {gameId, userId});
 }
 
-function handleError(msg) {
-  console.log(msg);
-  showError(msg.message);
-}
-
-function hideMsgSlowly() {
-  $msgBox.fadeOut(2000);
-}
-
-function showInfo(msg) {
-  $msgBox.show();
-  if (!$msgBox.hasClass('alert-primary')) {
-    $msgBox.addClass('alert-primary');
-  }
-  $msgBox.removeClass('alert-danger');
-  $msgBox.text(msg);
-  hideMsgSlowly();
-}
-
-function showError(err) {
-  $msgBox.show();
-  if (!$msgBox.hasClass('alert-danger')) {
-    $msgBox.addClass('alert-danger');
-  }
-  $msgBox.removeClass('alert-primary');
-  $msgBox.text(err);
-  hideMsgSlowly();
-}
 
 function drawPlayerNode(p) {
   const color = p.color;
@@ -490,15 +402,6 @@ function paintPlayer(player, size) {
   ctx.lineWidth = 1;
   ctx.fillStyle = "#def";
   ctx.fillRect(Math.ceil(snake.body.at(-1).x) * size, Math.ceil(snake.body.at(-1).y) * size, size, size);
-}
-
-function handleHttpErrors(res, err) {
-  if (res.status < 500) {
-    showError(err.message);
-  } else {
-    showError("Server error");
-    console.log(err.message);
-  }
 }
 
 
