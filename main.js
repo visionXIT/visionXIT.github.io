@@ -243,7 +243,7 @@ async function newGame() {
         'maxPlayers': 5,
         'ownerId': userId,
         "delayTime": 10000,
-        "endPlay": false,
+        "endPlay": true,
         "maxSpeedPhase": 10,
         "startSpeedPhaze": 18,
         "increasingVelPerScores": 2,
