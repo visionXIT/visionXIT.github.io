@@ -2,9 +2,6 @@ const BG_COLOUR = '#231f20';
 const SNAKE_COLOUR = '#c2c2c2';
 const FOOD_COLOUR = '#f11';
 const FOOD_COLOUR2 = '#ee1';
-const ADDRESS = "https://snake-bdj8.onrender.com";
-const SOCKET_ADDRESS = ADDRESS
-const HTTP_ADDRESS = ADDRESS
 
 const socket = io(SOCKET_ADDRESS);
 
@@ -79,10 +76,9 @@ gameInfo.hidden = true;
 // lastWinnerText.hidden = true;
 $msgBox.hide()
 
-reloadGames()
-// setInterval(() => reloadGames(), 10000);
 loadAuth();
 conductStates();
+reloadGames();
 
 
 function setAuth() {
@@ -426,16 +422,16 @@ function keydown(e) {
   const code = e.keyCode;
   switch (code) {
     case 37:
-      move = 1;
-      break;
-    case 40:
-      move = 2;
-      break;
-    case 39:
       move = 0;
       break;
-    case 38:
+    case 40:
       move = 3;
+      break;
+    case 39:
+      move = 1;
+      break;
+    case 38:
+      move = 2;
       break;
     default:
       return;
@@ -467,12 +463,6 @@ function paintGame(game) {
     if (!player.alive) continue;
     paintPlayer(player, size);
   }
-  ctx.moveTo(90, 90);
-  ctx.lineTo(170, 170);
-  ctx.moveTo(170, 90);
-  ctx.lineTo(90, 170);
-  ctx.lineWidth = 15;
-  ctx.stroke();
 }
 
 function paintPlayer(player, size) {
@@ -491,6 +481,11 @@ function paintPlayer(player, size) {
       ctx.lineWidth = 3;
       ctx.strokeRect(Math.ceil(cell.x) * size, Math.ceil(cell.y) * size, size, size);
     }
+  }
+  if (!player.started) {
+    ctx.strokeStyle = 'gold'
+    ctx.lineWidth = 3;
+    ctx.strokeRect(Math.ceil(snake.body.at(-1).x) * size, Math.ceil(snake.body.at(-1).y) * size, size, size);
   }
   ctx.lineWidth = 1;
   ctx.fillStyle = "#def";
