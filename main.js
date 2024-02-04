@@ -38,7 +38,6 @@ const gamesScreen = document.getElementById('gamesScreen');
 const lastWinnerDiv = document.getElementById('lastWinnerDiv');
 const lastWinnerText = document.getElementById('lastWinnerText');
 
-
 const logoutBtn = document.getElementById('logoutBtn');
 
 const canvas = document.getElementById('canvas');
@@ -223,7 +222,7 @@ async function newGame() {
         "maxSpeedPhase": 10,
         "startSpeedPhaze": 18,
         "increasingVelPerScores": 2,
-        "numApples": 4
+        "numApples": 3
       }
     })
   })
@@ -297,6 +296,7 @@ function drawGames(games) {
       cancel.style.position = 'absolute';
       cancel.style.right = '20px';
       cancel.style.top = '35%'
+      cancel.setAttribute('gameCode', game.gameId);
       node.appendChild(cancel);
     }
     gamesScreen.appendChild(node);
@@ -310,12 +310,13 @@ async function deleteGame(e) {
     'headers': {
       'Content-Type': 'application/json;charset=utf-8'
     },
-    "body": JSON.stringify({userId, e})
+    "body": JSON.stringify({gameId: e.target.getAttribute('gameCode'), userId})
   });
   if (!res.ok) {
     const err = await res.json();
     handleHttpErrors(res, err);
   }
+  reloadGames();
 }
 
 function init() {
@@ -358,12 +359,13 @@ function keydown(e) {
 function paintGame(game) {
   ctx.fillStyle = BG_COLOUR;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
-  const gridsize = game.fieldSettings.fieldW;
-  const size = canvas.width / gridsize;
+  const gridsizeW = game.fieldSettings.fieldW;
+  const gridsizeH = game.fieldSettings.fieldH;
+  const sizeW = canvas.width / gridsizeW, sizeH = canvas.height / gridsizeH;
   ctx.strokeStyle = 'green';
-  for (let i = 0; i < gridsize; i++) {
-    for (let j = 0; j < gridsize; j++) {
-      ctx.strokeRect(i * size, j * size, size, size);
+  for (let i = 0; i < gridsizeW; i++) {
+    for (let j = 0; j < gridsizeH; j++) {
+      ctx.strokeRect(i * sizeW, j * sizeH, sizeW, sizeH);
     }
   }
   for (let food of game.foods) {
@@ -371,16 +373,16 @@ function paintGame(game) {
       ctx.fillStyle = FOOD_COLOUR2;
     else
       ctx.fillStyle = FOOD_COLOUR;
-    ctx.fillRect(food.x * size, food.y * size, size, size);
+    ctx.fillRect(food.x * sizeW, food.y * sizeH, sizeW, sizeH);
   }
 
   for (let player of game.players) {
     if (!player.alive) continue;
-    paintPlayer(player, size);
+    paintPlayer(player, sizeW, sizeH);
   }
 }
 
-function paintPlayer(player, size) {
+function paintPlayer(player, sizeW, sizeH) {
   const snake = player.snake;
   const color = player.color;
   const colorRgb = `rgb(${Math.floor(color[0] * 255)}, ${Math.floor(color[1] * 255)}, ${Math.floor(color[2] * 255)})`;
@@ -388,32 +390,32 @@ function paintPlayer(player, size) {
   ctx.strokeStyle = 'gray';
   for (let cell of snake.body.slice(0, -1)) {
     ctx.fillStyle = colorRgb;
-    ctx.fillRect(Math.ceil(cell.x) * size, Math.ceil(cell.y) * size, size, size);
+    ctx.fillRect(Math.ceil(cell.x) * sizeW, Math.ceil(cell.y) * sizeH, sizeW, sizeH);
     if (player.started) {
       ctx.lineWidth = 1;
-      ctx.strokeRect(Math.ceil(cell.x) * size, Math.ceil(cell.y) * size, size, size);
+      ctx.strokeRect(Math.ceil(cell.x) * sizeW, Math.ceil(cell.y) * sizeH, sizeW, sizeH);
     } else {
       ctx.strokeStyle = 'gold'
       ctx.lineWidth = 3;
-      ctx.strokeRect(Math.ceil(cell.x) * size, Math.ceil(cell.y) * size, size, size);
+      ctx.strokeRect(Math.ceil(cell.x) * sizeW, Math.ceil(cell.y) * sizeH, sizeW, sizeH);
     }    
   }
   for (let id = 0; id < snake.body.length - 1; id++) {
     ctx.beginPath(); // Начинает новый путь
     ctx.lineWidth = 2;
     ctx.strokeStyle = 'yellow';
-    ctx.moveTo(Math.ceil(snake.body[id].x) * size + size/2, Math.ceil(snake.body[id].y) * size + size/2); // Передвигает перо в точку (30, 50)
-    ctx.lineTo(Math.ceil(snake.body[id + 1].x) * size + size/2, Math.ceil(snake.body[id + 1].y) * size + size/2); // Рисует линию до точки (150, 100)
+    ctx.moveTo(Math.ceil(snake.body[id].x) * sizeW + sizeW/2, Math.ceil(snake.body[id].y) * sizeH + sizeH/2); // Передвигает перо в точку (30, 50)
+    ctx.lineTo(Math.ceil(snake.body[id + 1].x) * sizeW + sizeW/2, Math.ceil(snake.body[id + 1].y) * sizeH + sizeH/2); // Рисует линию до точки (150, 100)
     ctx.stroke(); // Отображает путь
   }
   if (!player.started) {
     ctx.strokeStyle = 'gold'
     ctx.lineWidth = 3;
-    ctx.strokeRect(Math.ceil(snake.body.at(-1).x) * size, Math.ceil(snake.body.at(-1).y) * size, size, size);
+    ctx.strokeRect(Math.ceil(snake.body.at(-1).x) * sizeW, Math.ceil(snake.body.at(-1).y) * sizeH, sizeW, sizeH);
   }
   ctx.lineWidth = 1;
   ctx.fillStyle = "#def";
-  ctx.fillRect(Math.ceil(snake.body.at(-1).x) * size, Math.ceil(snake.body.at(-1).y) * size, size, size);
+  ctx.fillRect(Math.ceil(snake.body.at(-1).x) * sizeW, Math.ceil(snake.body.at(-1).y) * sizeH, sizeW, sizeH);
 }
 
 
