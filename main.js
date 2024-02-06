@@ -172,25 +172,25 @@ function handleGameState(msg) {
   const player =  msg.game.players.find(p => p.userId === userId)
   scoreText.innerText = player.score;
   lastSpeed = player.speedPhase;
-  let slide = 3 / lastSpeed, body = player.snake.body;
-  // requestAnimationFrame(() => paintGame(game));
-  if (player.snake.head.x === lastHeadPos?.x && player.snake.head.y === lastHeadPos?.y) {
-    return;
-  }
-  lastHeadPos = player.snake.head;
-  // console.log(lastHeadPos, player.snake.head);
-  clearInterval(gameInterval);
-  // console.log(body);
-  gameInterval = setInterval(() => {
-    requestAnimationFrame(() => paintGame(game));
-    body.at(-1).x += player.snake.velx * slide;
-    body.at(-1).y += player.snake.vely * slide;
-    player.snake.head = body.at(-1);
-    for (let i = body.length - 2; i > 0; i--) {
-      body[i].x += slide * (body[i - 1].x - body[i].x);
-      body[i].y += slide * (body[i - 1].y - body[i].y);
-    }
-  }, 45);
+  // let slide = 3 / lastSpeed, body = player.snake.body;
+  requestAnimationFrame(() => paintGame(game));
+  // if (player.snake.head.x === lastHeadPos?.x && player.snake.head.y === lastHeadPos?.y) {
+  //   return;
+  // }
+  // lastHeadPos = player.snake.head;
+  // // console.log(lastHeadPos, player.snake.head);
+  // clearInterval(gameInterval);
+  // // console.log(body);
+  // gameInterval = setInterval(() => {
+  //   requestAnimationFrame(() => paintGame(game));
+  //   body.at(-1).x += player.snake.velx * slide;
+  //   body.at(-1).y += player.snake.vely * slide;
+  //   player.snake.head = body.at(-1);
+  //   for (let i = body.length - 2; i > 0; i--) {
+  //     body[i].x += slide * (body[i - 1].x - body[i].x);
+  //     body[i].y += slide * (body[i - 1].y - body[i].y);
+  //   }
+  // }, 45);
 }
 
 function handleGameOver(msg) {
