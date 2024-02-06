@@ -2,7 +2,9 @@ const BG_COLOUR = '#231f20';
 const SNAKE_COLOUR = '#c2c2c2';
 const FOOD_COLOUR = '#f11';
 const FOOD_COLOUR2 = '#ee1';
+const OBSTACLE_COLOUR = '#ccc';
 const SCREEN_SIZE = 20;
+const FPS = 60;
 
 const socket = io(SOCKET_ADDRESS);
 
@@ -56,6 +58,9 @@ let colors = [];
 let roomPlayers = [];
 let games = [];
 let gameId;
+let lastSpeed;
+let gameInterval;
+let lastHeadPos;
 
 document.addEventListener('keydown', keydown);
 newGameBtn.addEventListener('click', newGame);
@@ -101,6 +106,7 @@ async function joinGameByBtn() {
   initialScreen.hidden = true;
   gameScreen.hidden = false;
   gameActive = true;
+  joinInGameBtn.hidden = true;
 }
 
 function reloadGames() {
@@ -150,24 +156,47 @@ function handlePlayerLost(msg) {
   if (msg.userId === userId) {
     showInfo("You lost")
     gameActive = false;
+    joinInGameBtn.hidden = false;
   }
 }
 
 function handleGameStarted() {
   gameActive = true;
+  joinInGameBtn.hidden = true;
   gameScreen.focus();
   startGameBtn.hidden = true;
 }
 
 function handleGameState(msg) {
   const game = msg.game;
-  scoreText.innerText = msg.game.players.find(p => p.userId === userId).score;
-  requestAnimationFrame(() => paintGame(game));
+  const player =  msg.game.players.find(p => p.userId === userId)
+  scoreText.innerText = player.score;
+  lastSpeed = player.speedPhase;
+  let slide = 3 / lastSpeed, body = player.snake.body;
+  // requestAnimationFrame(() => paintGame(game));
+  if (player.snake.head.x === lastHeadPos?.x && player.snake.head.y === lastHeadPos?.y) {
+    return;
+  }
+  lastHeadPos = player.snake.head;
+  // console.log(lastHeadPos, player.snake.head);
+  clearInterval(gameInterval);
+  // console.log(body);
+  gameInterval = setInterval(() => {
+    requestAnimationFrame(() => paintGame(game));
+    body.at(-1).x += player.snake.velx * slide;
+    body.at(-1).y += player.snake.vely * slide;
+    player.snake.head = body.at(-1);
+    for (let i = body.length - 2; i > 0; i--) {
+      body[i].x += slide * (body[i - 1].x - body[i].x);
+      body[i].y += slide * (body[i - 1].y - body[i].y);
+    }
+  }, 45);
 }
 
 function handleGameOver(msg) {
   init();
   gameActive = false;
+  joinInGameBtn.hidden = true;
   if (!msg.player?.userId) {
     lastWinnerText.innerText = '------';  
     showInfo("Game Over");
@@ -240,14 +269,15 @@ async function newGame() {
       },
       'gameSettings': {
         'minPlayers': 1,
-        'maxPlayers': 5,
+        'maxPlayers': 20,
         'ownerId': userId,
         "delayTime": 10000,
         "endPlay": true,
         "maxSpeedPhase": 10,
-        "startSpeedPhaze": 18,
+        "startSpeedPhaze": 16,
         "increasingVelPerScores": 2,
-        "numApples": 50
+        "numApples": 120,
+        "numObstacles": 80
       }
     })
   })
@@ -258,6 +288,7 @@ async function newGame() {
   }
   gameId = body;
   socket.emit('join_game', {gameId, userId});
+  joinInGameBtn.hidden = true;
   init();
 }
 
@@ -285,7 +316,7 @@ async function joinGame() {
   gameCodeDisplay.textContent = gameId;
   initialScreen.hidden = true;
   gameScreen.hidden = false;
-
+  joinInGameBtn.hidden = true;
 } 
 
 async function getAllGames() {
@@ -449,16 +480,21 @@ function paintGame(game) {
   ctx.fillStyle = BG_COLOUR;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   const size = canvas.width / SCREEN_SIZE
+  
+  
+  const player = game.players.find(p => p.userId === userId);
+  const minX = Math.floor(player.snake.head.x - SCREEN_SIZE / 2), maxX = Math.floor(player.snake.head.x + SCREEN_SIZE / 2);
+  const minY = Math.floor(player.snake.head.y - SCREEN_SIZE / 2), maxY = Math.floor(player.snake.head.y + SCREEN_SIZE / 2);
+  
   ctx.strokeStyle = 'green';
   ctx.lineWidth = 1;
+  
   for (let i = 0; i < SCREEN_SIZE; i++) {
     for (let j = 0; j < SCREEN_SIZE; j++) {
       ctx.strokeRect(i * size, j * size, size, size);
     }
   }
-  const player = game.players.find(p => p.userId === userId);
-  const minX = player.snake.head.x - SCREEN_SIZE / 2, maxX = player.snake.head.x + SCREEN_SIZE / 2;
-  const minY = player.snake.head.y - SCREEN_SIZE / 2, maxY = player.snake.head.y + SCREEN_SIZE / 2;
+
   if (player.snake.head.x < SCREEN_SIZE / 2) {
     const dif = SCREEN_SIZE / 2 - player.snake.head.x;
     ctx.fillStyle = '#eee';
@@ -495,6 +531,7 @@ function paintGame(game) {
       }
     }
   }
+  
 
   for (let food of game.foods) {
     if (!checkInArea(food.x, food.y, minX, maxX, minY, maxY)) {
@@ -507,10 +544,19 @@ function paintGame(game) {
     ctx.fillRect((food.x - minX) * size, (food.y - minY) * size, size, size);
   }
 
+  for (let ob of game.obstacles) {
+    ctx.fillStyle = OBSTACLE_COLOUR;
+    ctx.fillRect((ob.x - minX) * size, (ob.y - minY) * size, size, size);
+    // ctx.strokeStyle = 'black';
+    // ctx.lineWidth = 2;
+    // ctx.strokeRect((ob.x - minX) * size, (ob.y - minY) * size, size, size)
+  }
+
   for (let player of game.players) {
     if (!player.alive) continue;
     paintPlayer2(player, size, minX, maxX, minY, maxY);
   }
+  
 
   drawMinimap(game);
 }
