@@ -3,7 +3,7 @@ const SNAKE_COLOUR = '#c2c2c2';
 const FOOD_COLOUR = '#f11';
 const FOOD_COLOUR2 = '#ee1';
 const OBSTACLE_COLOUR = '#ccc';
-const SCREEN_SIZE = 30;
+const SCREEN_SIZE = 20;
 const FPS = 60;
 
 const socket = io(SOCKET_ADDRESS);
@@ -273,9 +273,9 @@ async function newGame() {
         'ownerId': userId,
         "delayTime": 10000,
         "endPlay": true,
-        "maxSpeedPhase": 6,
-        "startSpeedPhaze": 12,
-        "increasingVelPerScores": 2,
+        "maxSpeedPhase": 8,
+        "startSpeedPhaze": 14,
+        "increasingVelPerScores": 3,
         "numApples": 120,
         "numObstacles": 80
       }
